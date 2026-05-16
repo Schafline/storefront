@@ -6,6 +6,16 @@ namespace Storefront.Pages;
 
 public class BasketModel : PageModel
 {
+  private readonly IConfiguration _config;
+
+  public BasketModel(IConfiguration config)
+  {
+    _config = config;
+  }
+
+  public string PayPalClientId
+  { get; private set; }
+
   public List<Product> BasketItems
   { get; set; } = new();
 
@@ -60,5 +70,7 @@ public class BasketModel : PageModel
     BasketItems.Sum(p => p.Price);
 
     TempData.Keep("Basket");
+    PayPalClientId =
+    _config["PayPal:SandboxClientId"];
   }
 }

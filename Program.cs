@@ -2,6 +2,9 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+.AddUserSecrets<Program>();
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 
