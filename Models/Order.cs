@@ -13,4 +13,7 @@ public class Order
 
   public List<OrderItem> Items { get; set; }
     = new();
+
+  public string? VerificationCode
+  { get; set; }
 }
