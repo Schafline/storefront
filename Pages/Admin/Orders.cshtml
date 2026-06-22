@@ -1,0 +1,218 @@
+@page
+@using Storefront.Models
+@model OrdersModel
+
+<h2>Orders</h2>
+
+<!-- Search box -->
+<form method="get"
+      class="mb-3">
+  <input type="text"
+         name="q"
+         value="@Model.Query"
+         class="form-control"
+         placeholder="Search orders..." />
+</form>
+
+<!-- Orders list -->
+<div class="orders-list">
+
+  @if (Model.Orders?.Count > 0)
+  {
+    @for (int i = 0;
+         i < Model.Orders.Count;
+         i++)
+    {
+      var order = Model.Orders[i];
+
+      <details class="mb-2 border
+                      rounded p-2">
+        <summary class="d-flex
+                        justify-content-between
+                        align-items-center">
+
+          <!-- Summary left -->
+          <span>
+            <strong>
+              Order #@order.Id
+            </strong>
+            — @(order.ShippingInfo?.FullName ?? "No name")
+            — @(order.ShippingInfo?.Email ?? "No email")
+          </span>
+
+          <!-- Summary right -->
+          <span>
+            @order.Total.ToString("C")
+            —
+            <span class="badge bg-@(
+                     order.OrderStatus 
+                     == OrderStatusConstants.Paid
+                       ? "success"
+                       :"secondary")">
+              @order.OrderStatus
+            </span>
+            —
+            @order.OrderDate.ToString("dd MMM yyyy")
+          </span>
+
+        </summary>
+
+        <!-- Expanded section -->
+        <div class="mt-3">
+          <form method="post">
+            <input type="hidden"
+                   name="orderId"
+                   value="@order.Id" />
+          <h6>Customer Details</h6>
+          <div>
+            <strong>Name:</strong>
+            @(order.ShippingInfo?.FullName ?? "No name")
+          </div>
+          <div>
+            <strong>Email:</strong>
+            @(order.ShippingInfo?.Email ?? "No email")
+          </div>
+          <div>
+            <strong>Address:</strong>
+            @(order.ShippingInfo?.AddressLine1 ?? "No address")
+          </div>
+          <div>
+            <strong>Postcode:</strong>
+            @(order.ShippingInfo?.Postcode ?? "No postcode")
+          </div>
+          <h6 class="mt-3">
+            Order Details
+          </h6>
+          <div>
+            <strong>Order ID:</strong>
+            @order.Id
+          </div>
+          <div>
+            <strong>Date:</strong>
+            @order.OrderDate.ToString("dd MMM yyyy")
+          </div>
+          <div class="form-group
+                      d-flex
+                      align-items-end
+                      gap-2">
+            <label for="status-@i">
+              <strong>
+                Status:
+              </strong>
+            </label>
+
+            <select name="OrderStatus"
+                    class="form-control">
+            @{
+                bool isPending = order.OrderStatus 
+                == OrderStatusConstants.Pending;
+            }
+              <option value=
+                   "@OrderStatusConstants.Pending"
+                    selected="@(isPending)">
+                Pending
+              </option>
+            @{
+                bool isPaid = order.OrderStatus 
+                == OrderStatusConstants.Paid;
+            }
+              <option value=
+                   "@OrderStatusConstants.Paid"
+                    selected="@(isPaid)">
+                Paid
+              </option>
+            @{
+                bool isProcessing = order.OrderStatus
+                == OrderStatusConstants.Processing;
+            }
+              <option value=
+                   "@OrderStatusConstants.Processing"
+                    selected="@(isProcessing)">
+                Processing
+              </option>
+            @{
+                bool isShipped = order.OrderStatus 
+                == OrderStatusConstants.Shipped;
+            }
+              <option value=
+                   "@OrderStatusConstants.Shipped"
+                    selected="@(isShipped)">
+                Shipped
+              </option>
+            @{
+                bool isCompleted = order.OrderStatus 
+                == OrderStatusConstants.Completed;
+            }
+              <option value=
+                   "@OrderStatusConstants.Completed"
+                    selected="@(isCompleted)">
+                Completed
+              </option>
+            @{
+                bool isCancelled = order.OrderStatus 
+                == OrderStatusConstants.Cancelled;
+            }
+              <option value=
+                      "@OrderStatusConstants.Cancelled"
+                      selected="@(isCancelled)">
+                Cancelled
+              </option>
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary mt-2">
+              Save
+            </button>
+          </div>
+          <div>
+            <strong>Verification Code:</strong>
+            @order.VerificationCode
+          </div>
+
+          <h6 class="mt-3">
+            Items
+          </h6>
+
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (var item in 
+                order.Items 
+                ?? Enumerable.Empty<OrderItem>())
+              {
+                <tr>
+                  <td>
+                    @item.Product.Name
+                  </td>
+                  <td>
+                    @item.Quantity
+                  </td>
+                  <td>
+                    @item.Price.ToString("C")
+                  </td>
+                  <td>
+                    @((item.Price * item.Quantity)
+                      .ToString("C"))
+                  </td>
+                </tr>
+              }
+            </tbody>
+            </table>
+          </form>
+        </div>
+      </details>
+    }
+  }
+  else
+  {
+    <div>No orders found.</div>
+  }
+
+</div>
