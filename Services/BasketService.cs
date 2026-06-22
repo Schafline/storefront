@@ -1,3 +1,4 @@
+using Storefront.Constants;
 using Storefront.Models;
 using System.Text.Json;
 
@@ -26,7 +27,7 @@ public class BasketService
         .HttpContext.Session;
 
     var json =
-      session.GetString(BasketKey);
+      session.GetString(SessionKeys.BasketKey);
 
     if (string.IsNullOrEmpty(json))
       return new List<Product>();
@@ -56,7 +57,7 @@ public class BasketService
         basket);
 
     session.SetString(
-      BasketKey,
+      SessionKeys.BasketKey,
       json);
   }
 
@@ -66,6 +67,7 @@ public class BasketService
       _httpContextAccessor
         .HttpContext.Session;
 
-    session.Remove(BasketKey);
+    session.Remove(SessionKeys.BasketKey);
+    session.Remove(SessionKeys.ShippingInfoIdKey);
   }
 }

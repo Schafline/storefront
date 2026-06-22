@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Storefront.Models;
+using Storefront.Constants;
 using Storefront.Data;
 using Storefront.Services;
 
@@ -39,6 +41,8 @@ public class BasketModel : PageModel
   public decimal TotalPrice
   { get; set; }
 
+  public bool HasShippingInfo { get; private set; }
+
   public IActionResult OnPostRemove()
   {
     var basket = _basketService.GetBasket();
@@ -49,6 +53,12 @@ public class BasketModel : PageModel
     {
       basket.Remove(itemToRemove);
       _basketService.SaveBasket(basket);
+      if (!basket.Any())
+      {
+        HttpContext.Session.Remove(
+          SessionKeys
+            .ShippingInfoIdKey);
+      }
     }
 
     return RedirectToPage();
@@ -56,6 +66,9 @@ public class BasketModel : PageModel
 
   public void OnGet()
   {
+    HasShippingInfo =
+     HttpContext.Session.GetInt32(
+       SessionKeys.ShippingInfoIdKey) != null;
     BasketItems = _basketService.GetBasket();
     TotalPrice = BasketItems.Sum(p => p.Price);
     PayPalClientId = _config["PayPal:SandboxClientId"];
@@ -67,9 +80,14 @@ public class BasketModel : PageModel
   {
     var cart = _basketService.GetBasket();
 
+    var shippingInfoId =
+      HttpContext.Session.GetInt32(
+        SessionKeys.ShippingInfoIdKey);
+
     var order = new Order
     {
-      OrderDate = DateTime.UtcNow
+      OrderDate = DateTime.UtcNow,
+      ShippingInfoId = shippingInfoId
     };
 
     foreach (var product in cart)
@@ -103,19 +121,33 @@ public class BasketModel : PageModel
         ex.Message);
       throw;
     }
+    var shippingInfo = await _context
+      .ShippingInfos
+      .FirstOrDefaultAsync(s =>
+        s.Id == shippingInfoId);
 
-    try
-    {
-      await _emailService.SendEmailAsync(
-        "Order Confirmation",
-        "Thank you for your order! " +
-        "Your verification code is: " +
-        order.VerificationCode);
-    }
-    catch (Exception ex)
+    if (shippingInfo == null)
     {
       Console.Error.WriteLine(
-        "Email failed: " + ex.Message);
+        $"No shipping info found for " +
+        $"ID {shippingInfoId}");
+    }
+    else
+    {
+      try
+      {
+        await _emailService.SendEmailAsync(
+          shippingInfo.Email,
+          "Order Confirmation",
+          "Thank you for your order! " +
+          "Your verification code is: " +
+          order.VerificationCode);
+      }
+      catch (Exception ex)
+      {
+        Console.Error.WriteLine(
+          "Email failed: " + ex.Message);
+      }
     }
 
     _basketService.Clear();

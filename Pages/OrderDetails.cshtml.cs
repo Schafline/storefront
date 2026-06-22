@@ -37,6 +37,7 @@ public class OrderDetailsModel
 
     Order = _context.Orders
       .Include(o => o.Items)
+      .Include(o => o.ShippingInfo)
       .FirstOrDefault(o =>
         o.VerificationCode ==
           normalisedCode);

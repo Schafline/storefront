@@ -16,4 +16,11 @@ public class Order
 
   public string? VerificationCode
   { get; set; }
+
+  public int? ShippingInfoId
+  { get; set; }
+
+  public ShippingInfo ShippingInfo
+  { get; set; }
+
 }

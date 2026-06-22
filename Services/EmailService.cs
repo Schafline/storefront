@@ -21,6 +21,7 @@ namespace Storefront.Services
     }
 
     public async Task SendEmailAsync(
+      string toEmail,
       string subject,
       string body)
     {
@@ -33,7 +34,7 @@ namespace Storefront.Services
         },
         to = new[]
         {
-          new { email = _settings.To }
+          new { email = toEmail }
         },
         subject = subject,
         htmlContent = body
