@@ -1,0 +1,94 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f6f0;
+  color: #333;
+}
+
+.navbar {
+  background-color: #e5d4b8;
+  border-bottom: 2px solid #c9b79c;
+}
+
+.site-logo {
+  height: 120px;
+  /* default for desktop */
+}
+
+@media(max-width: 600px) {
+  .site-logo {
+    max-height: 80px;
+  }
+}
+
+.btn-primary {
+  background-color: #d2691e;
+  border-color: #b3540e;
+}
+
+.btn-primary:hover {
+  background-color: #b3540e;
+  border-color: #8a3e07;
+}
+
+.btn-primary:active,
+.btn-primary:focus,
+.btn-primary:focus-visible {
+  background-color: #8a3e07 !important;
+  border-color: #6a2e05 !important;
+}
+
+.btn-primary:focus,
+.btn-primary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(240, 156, 96, 0.7) !important;
+}
+
+.btn-success {
+  background-color: #9caf88;
+  border-color: #7a8a6a;
+}
+
+.btn-success:hover {
+  background-color: #7a8a6a;
+  border-color: #5f6b4f;
+}
+
+.btn-success:active,
+.btn-success:focus,
+.btn-success:focus-visible {
+  background-color: #6b7a5f !important;
+  border-color: #556644 !important;
+}
+
+.btn-success:focus,
+.btn-success:focus-visible {
+  box-shadow: 0 0 0 3px 
+  rgba(168, 213, 186, 0.7) 
+  !important;
+}
+
+.btn-danger {
+  background-color: #c94f4f;
+  border-color: #9c3f3f;
+}
+
+.btn-danger:hover {
+  background-color: #9c3f3f;
+  border-color: #7a3232;
+}
+
+.btn-danger:active,
+.btn-danger:focus,
+.btn-danger:focus-visible {
+  background-color: #7a3232 !important;
+  border-color: #5c2727 !important;
+}
+
+.btn-danger:focus,
+.btn-danger:focus-visible {
+  box-shadow: 0 0 0 3px rgba(224, 122, 122, 0.7) !important;
+}
+
+.badge.bg- {
+  background-color: #d2691e !important;
+  color: white;
+}
