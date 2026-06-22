@@ -3,17 +3,23 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Storefront.Models;
 using Microsoft.EntityFrameworkCore;
 using Storefront.Data;
+using Storefront.Services;
 
 namespace Storefront.Pages;
 
 public class ProductDetailModel : PageModel
 {
   private readonly ShopContext _context;
+  private readonly BasketService _basketService;
 
-  public ProductDetailModel(ShopContext context)
+  public ProductDetailModel(
+    ShopContext context,
+    BasketService basketService)
   {
     _context = context;
+    _basketService = basketService;
   }
+
 
   [BindProperty(SupportsGet = true)]
   public int Id { get; set; }
@@ -47,24 +53,7 @@ public class ProductDetailModel : PageModel
     {
       return NotFound();
     }
-
-    var basketJson =
-    TempData["Basket"] as string ?? "[]";
-
-    var basketItems =
-    System.Text.Json.JsonSerializer
-    .Deserialize<List<Product>>(basketJson)
-    ?? new List<Product>();
-
-    if (basketItems != null)
-    {
-      basketItems.Add(product);
-    }
-
-    TempData["Basket"] =
-    System.Text.Json.JsonSerializer
-    .Serialize(basketItems);
-
+    _basketService.AddToBasket(product);
     return RedirectToPage("/Basket");
   }
 }

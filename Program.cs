@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Storefront.Data;
+using Storefront.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,12 @@ builder.Services
       "/Admin/Login";
   });
 
+builder.Services.AddScoped<BasketService>();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSession();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,6 +61,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

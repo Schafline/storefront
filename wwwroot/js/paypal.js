@@ -23,8 +23,21 @@ paypal.Buttons({
     return actions.order
       .capture()
       .then(function (details) {
-        window.location.href =
-          '/Confirmation';
+        return fetch('/Basket?handler=CompleteOrder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderId: data.orderID,
+            payerId: data.payerID
+          })
+        })
+          .then(response => response.json())
+          .then(result => {
+            window.location =
+              `/Confirmation?id=${result.orderId}`;
+          });
       });
   }
 })
