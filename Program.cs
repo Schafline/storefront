@@ -43,4 +43,12 @@ app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+  var context = scope.ServiceProvider
+    .GetRequiredService<ShopContext>();
+  context.Database.Migrate();
+  SeedData.Initialize(context);
+}
+
 app.Run();

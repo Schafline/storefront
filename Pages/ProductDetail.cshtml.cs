@@ -1,53 +1,48 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Storefront.Models;
+using Microsoft.EntityFrameworkCore;
+using Storefront.Data;
 
 namespace Storefront.Pages;
 
 public class ProductDetailModel : PageModel
 {
+  private readonly ShopContext _context;
+
+  public ProductDetailModel(ShopContext context)
+  {
+    _context = context;
+  }
+
   [BindProperty(SupportsGet = true)]
   public int Id { get; set; }
 
   public Product? Product { get; set; }
 
-  private List<Product> GetProducts()
+  public async Task<IActionResult> OnGetAsync()
   {
-    return new List<Product>
+    if (Id == 0)
     {
-      new Product
-      {
-        Id = 1,
-        Name = "T-shirt",
-        Description = "Soft cotton T-shirt",
-        Price = 19.99m,
-        ImageUrl = "/images/tshirt.jpg"
-      },
-      new Product
-      {
-        Id = 2,
-        Name = "Sneakers",
-        Description = "Comfortable running shoes",
-        Price = 49.99m,
-        ImageUrl = "/images/sneakers.jpg"
-      }
-    };
-  }
-
-  public void OnGet()
-  {
-    var product = GetProducts()
-    .FirstOrDefault(p => p.Id == Id);
-    if (product != null)
-    {
-      Product = product;
+      return NotFound();
     }
+
+    Product = await _context.Products
+    .FirstOrDefaultAsync(p => p.Id == Id);
+
+    if (Product == null)
+    {
+      return NotFound();
+    }
+
+    return Page();
   }
 
-  public IActionResult OnPost()
+  public async Task<IActionResult> OnPostAsync()
   {
-    var product = GetProducts()
-    .FirstOrDefault(p => p.Id == Id);
+    var product = await _context.Products
+    .FirstOrDefaultAsync(p => p.Id == Id);
+
     if (product == null)
     {
       return NotFound();
@@ -55,9 +50,11 @@ public class ProductDetailModel : PageModel
 
     var basketJson =
     TempData["Basket"] as string ?? "[]";
+
     var basketItems =
     System.Text.Json.JsonSerializer
-    .Deserialize<List<Product>>(basketJson);
+    .Deserialize<List<Product>>(basketJson)
+    ?? new List<Product>();
 
     if (basketItems != null)
     {
@@ -70,5 +67,4 @@ public class ProductDetailModel : PageModel
 
     return RedirectToPage("/Basket");
   }
-
 }
