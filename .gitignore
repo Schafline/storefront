@@ -491,3 +491,4 @@ appsettings.Development.json
 appsettings.Production.json
 
 .vscode/
+shop.db

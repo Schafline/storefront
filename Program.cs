@@ -1,4 +1,6 @@
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
+using Storefront.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,15 @@ builder.Services.AddRazorPages();
 var culture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+builder.Services.AddDbContext<ShopContext>(
+  options =>
+  {
+    options.UseSqlite(
+      builder.Configuration
+        .GetConnectionString(
+          "ShopDbConnection"));
+  });
 
 var app = builder.Build();
 
