@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Storefront.Data;
 
@@ -8,7 +9,14 @@ builder.Configuration
 .AddUserSecrets<Program>();
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+  options.Conventions
+    .AuthorizeFolder("/Admin");
+  options.Conventions
+    .AllowAnonymousToPage(
+      "/Admin/Login");
+});
 
 var culture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -21,6 +29,16 @@ builder.Services.AddDbContext<ShopContext>(
       builder.Configuration
         .GetConnectionString(
           "ShopDbConnection"));
+  });
+
+builder.Services
+  .AddAuthentication(
+    CookieAuthenticationDefaults
+      .AuthenticationScheme)
+  .AddCookie(options =>
+  {
+    options.LoginPath =
+      "/Admin/Login";
   });
 
 var app = builder.Build();
@@ -36,7 +54,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
